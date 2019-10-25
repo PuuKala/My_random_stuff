@@ -19,4 +19,4 @@ echo "INHERIT += \"rm_work\"" >> conf/local.conf
 echo "IMAGE_INSTALL += \"chromium-x11\"" >> conf/local.conf
 
 echo "Starting building..."
-bitbake core-image-minimal
+bitbake core-image-base
