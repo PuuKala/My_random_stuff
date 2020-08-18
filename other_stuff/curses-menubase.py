@@ -1,93 +1,34 @@
-# Copied from gitst.github.com/claymcleod -> pycurses.py
-import curses
+# Example copied from pypi.org/project/curses-menu/
+# Import the necessary packages
+from cursesmenu import CursesMenu, SelectionMenu
+from cursesmenu.items import MenuItem, FunctionItem, CommandItem, SubmenuItem
 
-def menu(stdscr):
-    height, width = stdscr.getmaxyx()
-    k = 0
-    cursor_x = 5
-    cursor_y = 5
+# Create the menu
+menu = CursesMenu("Title", "Subtitle")
 
-    box1 = curses.newwin(height-4, width-4, 2, 2)
-    box1.box()
+# Create some items
 
-    # Init/set colors
-    curses.start_color()
-    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_WHITE)
-    curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLACK)
-    curses.init_pair(3, curses.COLOR_CYAN, curses.COLOR_BLACK)
+# MenuItem is the base class for all items, it doesn't do anything when selected
+menu_item = MenuItem("Menu Item")
 
-    while (k != ord('q')):
+# A FunctionItem runs a Python function when selected
+function_item = FunctionItem("Call a Python function", input, ["Enter an input"])
 
-        # Init
-        stdscr.clear()
-        height, width = stdscr.getmaxyx()
+# A CommandItem runs a console command
+command_item = CommandItem("Run a console command",  "touch hello.txt")
 
-        # Controls from buttons
-        if k == curses.KEY_DOWN:
-            cursor_y += 1
-        elif k == curses.KEY_UP:
-            cursor_y -= 1
-        #elif k == curses.KEY_RIGHT:
-        #    cursor_x += 1
-        #elif k == curses.KEY_LEFT:
-        #    cursor_x -= 1
+# A SelectionMenu constructs a menu from a list of strings
+selection_menu = SelectionMenu(["item1", "item2", "item3"])
 
-        cursor_x = max(0, cursor_x)
-        cursor_x = min(width-1, cursor_x)
+# A SubmenuItem lets you add a menu (the selection_menu above, for example)
+# as a submenu of another menu
+submenu_item = SubmenuItem("Submenu item", selection_menu, menu)
 
-        cursor_y = max(0, cursor_y)
-        cursor_y = min(height-1, cursor_y)
+# Once we're done creating them, we just add the items to the menu
+menu.append_item(menu_item)
+menu.append_item(function_item)
+menu.append_item(command_item)
+menu.append_item(submenu_item)
 
-        # Texts
-        title = "Curses example"[:width-1]
-        subtitle = "At SKA's computer"[:width-1]
-        keystr = "Last key pressed: {}".format(k)[:width-1]
-        statusbarstr = "Press 'q' to exit | STATUS BAR | Pos: {}, {}".format(
-            cursor_x, cursor_y)
-        if k == 0:
-            keystr = "No key press detected..."[:width-1]
-
-        # Centering calc
-        start_x_title = int((width // 2) - (len(title) // 2) - len(title) % 2)
-        start_x_subtitle = int(
-            (width // 2) - (len(subtitle) // 2) - len(subtitle) % 2)
-        start_x_keystr = int(
-            (width // 2) - (len(keystr) // 2) - len(keystr) % 2)
-        start_y = int((height // 2) - 2)
-
-        # Rendering some txt
-        whstr = "Width: {}, Height: {}".format(width, height)
-        stdscr.addstr(0, 0, whstr, curses.color_pair(1))
-
-        # Render status bar
-        stdscr.attron(curses.color_pair(3))
-        stdscr.addstr(height-1, 0, statusbarstr)
-        stdscr.addstr(height-1, len(statusbarstr), " " *
-                      (width - len(statusbarstr) - 1))
-        stdscr.attroff(curses.color_pair(3))
-
-        # Turning on attr for title
-        stdscr.attron(curses.color_pair(2))
-        stdscr.attron(curses.A_BOLD)
-
-        # Print text
-        stdscr.addstr(start_y + 1, start_x_subtitle, subtitle)
-        stdscr.addstr(start_y + 3, (width // 2) - 2, "-" * 4)
-        stdscr.addstr(start_y + 5, start_x_keystr, keystr)
-        #stdscr.move(cursor_y, cursor_x)
-        box1.move(cursor_y, cursor_x)
-
-        # Refresh screen
-        stdscr.refresh()
-        box1.refresh()
-
-        # Wait for input
-        k = stdscr.getch()
-
-
-def main():
-    curses.wrapper(menu)
-
-
-if __name__ == "__main__":
-    main()
+# Finally, we call show to show the menu and allow the user to interact
+menu.show()
