@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# Pre-commit check for CMake built programs.
+# Ensures, that whatever you make with CMake builds and passes your own tests.
+
+# Make test_build folder and make tests in the folder
+mkdir test_build
+cd test_build
+
+# Make and check return value
+# NOTE: The tests NEED to be in tests folder. If not, change it here.
+cmake ../tests && make
+RETVAL=$?
+TESTS=( "echo test" )
+if [[ $RETVAL -eq 0 ]]; then
+ for cmd in ${TESTS[@]}; do
+  eval "$cmd"
+  RETVAL=$?
+  if [[ $RETVAL -ne 0 ]]; then
+   break
+  fi
+ done
+fi
+
+# Come out from the test_build folder and delete it
+cd ..
+rm -rf test_build
+
+# Exit with whatever return value we got
+exit $RETVAL
