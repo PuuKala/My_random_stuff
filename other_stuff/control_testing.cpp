@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <thread>
 #include <chrono>
+#include "gnuplot-iostream.h"
 
 class control_testing
 {
@@ -58,7 +59,9 @@ const float control_testing::control(const float target, const float current)
 
 int main(int argc, char const *argv[])
 {
-    control_testing ctrl(0.5, 0.01, 0.2);
+    Gnuplot gp;
+
+    control_testing ctrl(0.28, 0.000001, 0);
 
     float system_state[2] = {0, 0};
     float system_target = 100;
@@ -67,9 +70,12 @@ int main(int argc, char const *argv[])
     float max_min[2] = {0, 0};
     float max_d = 2;
     float prev_control = 0;
+    unsigned int total_count = 0;
+    std::vector<std::pair<unsigned int, float>> xy_points;
 
     for (unsigned char i = 0; i < 3;)
     {
+        xy_points.push_back(std::make_pair(total_count, system_state[0]));
         control = ctrl.control(system_target, system_state[0]);
         /*
         if (control > 4)
@@ -96,7 +102,7 @@ int main(int argc, char const *argv[])
 
         if (std::abs(system_state[0] - system_target) < 0.1)
         {
-            if (std::abs(system_state[0] - system_state[1]) < 0.01)
+            if (std::abs(system_state[0] - system_state[1]) < 0.1)
             {
                 if (system_target == 100)
                     system_target = 0;
@@ -110,9 +116,11 @@ int main(int argc, char const *argv[])
                 ++i;
             }
         }
-        //std::cout << std::endl;
-        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        ++total_count;
+        // std::cout << std::endl;
+        // std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+    gp << "plot" << gp.file1d(xy_points) << std::endl;
 
     return 0;
 }

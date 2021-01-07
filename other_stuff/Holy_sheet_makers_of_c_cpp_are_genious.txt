@@ -1,0 +1,12 @@
+Just realized, making a rotational system:
+If you're using uint as the representation of 360°, you can get straightest route to another angle
+by calculating:
+- int straightest_route = uint current - uint target
+
+If the target is larger than current, in casting the uint to int, the sign will flip and the bits
+are interpreted from the lowest point(0xffff -> close to zero, 0x8000 -> close to minimum).
+You could also think the 0's and 1's flip meaning, more 1's mean closer to 0 with negative numbers.
+
+So, when calculating angles when 360° is represented as uint, no much thinking is needed. Just
+subtract the target value from current value and cast it to same size int.
+Thank you Dennis Ritchie and Bjarne Stroustrup.
