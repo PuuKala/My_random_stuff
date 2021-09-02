@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
+set(CMAKE_BUILD_TYPE Debug)
 
 add_executable(LinuxInputPractice linux_input_practice.cpp)
 
@@ -21,5 +22,9 @@ include_directories(${CURSES_INCLUDE_DIR})
 add_executable(CursesTest curses_test.cpp)
 target_link_libraries(CursesTest ${MENU_LIBRARY} ${CURSES_LIBRARIES})
 
-add_executable(cJSONTest cjson_test.cpp cJSON/cJSON.c)
-target_include_directories(cJSONTest cJSON)
+#add_executable(cJSONTest cjson_test.cpp cJSON/cJSON.c)
+#target_include_directories(cJSONTest PRIVATE cJSON)
+
+add_executable(ncurses_JSON_editor ncurses_form.cpp)
+target_include_directories(ncurses_JSON_editor PRIVATE json_include)
+target_link_libraries(ncurses_JSON_editor PRIVATE ncurses form)
