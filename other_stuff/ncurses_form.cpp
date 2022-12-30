@@ -1,3 +1,16 @@
+/**
+ * JSON editor for a simple JSON file.
+ * This can be useful for a system with JSON based config file. The filename and shown fields can
+ * be hard coded so that the end user doesn't need to know which fields are meant to be user
+ * changeable.
+ *
+ * NOTE: The form validates only numeric values during input. If the value of the element isn't
+ * numeric, it is possible to write invalid data to the form resulting to undefined behaviour.
+ * The input can be validated before writing the file and should be validated better than this
+ * current program does.
+ *
+ * author: Sami Karkinen
+ */
 #include <algorithm>
 #include <fcntl.h>
 #include <form.h>
@@ -6,6 +19,8 @@
 #include <unistd.h>
 
 #define FILENAME "some_configs.json"
+
+// Some arbitrary max file size used to define file read/write buffer
 #define FILE_MAX_SIZE 0xffff
 
 int main()
@@ -33,6 +48,8 @@ int main()
     int ch;
 
     // Get configurable options from json
+    // NOTE: This implementation expects a 1 depth JSON object (for example
+    // {"int":1,"list":[1,2,3],"string":"something"})
     for (auto& element : js.items())
     {
         form_index_to_json.push_back(element.key());
@@ -55,9 +72,12 @@ int main()
     post_form(my_form);
     refresh(); // The fields
     for (uint8_t i = 0; i < form_index_to_json.size() && i < LINES; ++i)
-        mvprintw(i, 0, js[form_index_to_json[i]].dump().c_str());
-    mvprintw(LINES - 2, 0, "Exit with F1");
+        mvprintw(i, 0, form_index_to_json[i].c_str());
+    mvprintw(LINES - 2, 0, "Exit with F1, move with arrow keys");
     refresh(); // The field descriptions (keys)
+
+    // Move cursor visibly to the end of first line
+    form_driver(my_form, REQ_END_LINE);
 
     // Main input reading loop
     while ((ch = getch()) != KEY_F(1))
@@ -89,6 +109,9 @@ int main()
             break;
         }
     }
+
+    // Move the cursor to the end of the line for registering the current field
+    form_driver(my_form, REQ_END_LINE);
 
     // Get data from form and write it to json in correct format
     for (uint8_t i = 0; i < form_index_to_json.size(); ++i)
