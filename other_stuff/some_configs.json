@@ -1,20 +1,9 @@
-[
-    {
-        "int": 5,
-        "string": "something",
-        "list": [
-            1,
-            5,
-            7
-        ]
-    },
-    {
-        "int2": 5,
-        "string2": "something",
-        "list2": [
-            1,
-            5,
-            7
-        ]
-    }
-]
+{
+    "int": 5,
+    "string": "something",
+    "list": [
+        1,
+        5,
+        7
+    ]
+}
